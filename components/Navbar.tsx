@@ -15,36 +15,42 @@ const Navbar: React.FC<NavbarProps> = ({ session, profile, activeTab, setActiveT
   };
 
   return (
-    <nav className="bg-ajc-blue text-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white shadow-card sticky top-0 z-50 backdrop-blur-md bg-opacity-90 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 font-bold text-2xl tracking-wider">
-              AJC <span className="text-red-500 text-sm align-top">POC</span>
+        <div className="flex items-center justify-between h-20">
+          <div className="flex items-center gap-8">
+            <div className="flex-shrink-0 font-bold text-2xl tracking-tight text-ajc-blue">
+              AJC <span className="text-ajc-red text-sm font-extrabold px-1.5 py-0.5 bg-red-50 rounded-md align-top ml-1">POC</span>
             </div>
             {session && (
               <div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
+                <div className="flex items-baseline space-x-2">
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'dashboard' ? 'bg-blue-900 text-white' : 'text-gray-300 hover:bg-blue-800 hover:text-white'
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      activeTab === 'dashboard' 
+                        ? 'bg-ajc-blue text-white shadow-lg shadow-blue-900/20' 
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-ajc-blue'
                     }`}
                   >
                     Dashboard
                   </button>
                   <button
                     onClick={() => setActiveTab('inventory')}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'inventory' ? 'bg-blue-900 text-white' : 'text-gray-300 hover:bg-blue-800 hover:text-white'
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      activeTab === 'inventory' 
+                        ? 'bg-ajc-blue text-white shadow-lg shadow-blue-900/20' 
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-ajc-blue'
                     }`}
                   >
                     Inventory
                   </button>
                   <button
                     onClick={() => setActiveTab('shipments')}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'shipments' ? 'bg-blue-900 text-white' : 'text-gray-300 hover:bg-blue-800 hover:text-white'
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      activeTab === 'shipments' 
+                        ? 'bg-ajc-blue text-white shadow-lg shadow-blue-900/20' 
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-ajc-blue'
                     }`}
                   >
                     Logistics
@@ -53,14 +59,14 @@ const Navbar: React.FC<NavbarProps> = ({ session, profile, activeTab, setActiveT
               </div>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             {profile && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 pl-6 border-l border-gray-100">
                 <div className="text-sm text-right hidden sm:block">
-                  <p className="font-semibold">{profile.full_name}</p>
-                  <p className="text-xs text-gray-300 capitalize">{profile.role}</p>
+                  <p className="font-bold text-gray-800 leading-none mb-1">{profile.full_name}</p>
+                  <p className="text-xs text-gray-400 font-medium capitalize tracking-wide">{profile.role}</p>
                 </div>
-                <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-ajc-blue flex items-center justify-center text-white text-sm font-bold shadow-md ring-2 ring-white">
                   {profile.full_name?.charAt(0) || 'U'}
                 </div>
               </div>
@@ -68,9 +74,10 @@ const Navbar: React.FC<NavbarProps> = ({ session, profile, activeTab, setActiveT
             {session && (
               <button
                 onClick={handleSignOut}
-                className="bg-red-700 hover:bg-red-800 text-white px-3 py-1.5 rounded text-sm transition"
+                className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50"
+                title="Sign Out"
               >
-                Sign Out
+                <i className="fas fa-sign-out-alt text-lg"></i>
               </button>
             )}
           </div>
@@ -78,10 +85,19 @@ const Navbar: React.FC<NavbarProps> = ({ session, profile, activeTab, setActiveT
       </div>
       {/* Mobile Menu */}
       {session && (
-        <div className="md:hidden flex justify-around bg-blue-900 p-2">
-           <button onClick={() => setActiveTab('dashboard')} className={`p-2 ${activeTab === 'dashboard' ? 'text-white' : 'text-gray-400'}`}><i className="fas fa-chart-line"></i></button>
-           <button onClick={() => setActiveTab('inventory')} className={`p-2 ${activeTab === 'inventory' ? 'text-white' : 'text-gray-400'}`}><i className="fas fa-boxes"></i></button>
-           <button onClick={() => setActiveTab('shipments')} className={`p-2 ${activeTab === 'shipments' ? 'text-white' : 'text-gray-400'}`}><i className="fas fa-ship"></i></button>
+        <div className="md:hidden flex justify-around bg-white border-t border-gray-100 p-2 fixed bottom-0 w-full z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+           <button onClick={() => setActiveTab('dashboard')} className={`p-4 rounded-xl flex flex-col items-center ${activeTab === 'dashboard' ? 'text-ajc-blue' : 'text-gray-400'}`}>
+             <i className="fas fa-chart-line text-lg mb-1"></i>
+             <span className="text-[10px] font-bold">Dash</span>
+           </button>
+           <button onClick={() => setActiveTab('inventory')} className={`p-4 rounded-xl flex flex-col items-center ${activeTab === 'inventory' ? 'text-ajc-blue' : 'text-gray-400'}`}>
+             <i className="fas fa-boxes text-lg mb-1"></i>
+             <span className="text-[10px] font-bold">Stock</span>
+           </button>
+           <button onClick={() => setActiveTab('shipments')} className={`p-4 rounded-xl flex flex-col items-center ${activeTab === 'shipments' ? 'text-ajc-blue' : 'text-gray-400'}`}>
+             <i className="fas fa-ship text-lg mb-1"></i>
+             <span className="text-[10px] font-bold">Ship</span>
+           </button>
         </div>
       )}
     </nav>

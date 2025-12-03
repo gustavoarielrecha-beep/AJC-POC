@@ -1,11 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
-// Strictly satisfying the requirement to use process.env.API_KEY while ensuring functionality
-// for this specific demo environment where .env might not be present.
-// In a real production build, this assignment would be removed and the env var set in the OS/Container.
-process.env.API_KEY = "AIzaSyAedD8WaMU7Ws7-tQRjm8YQZktRL-RfqsU";
-
 interface Message {
   role: 'user' | 'model';
   text: string;
