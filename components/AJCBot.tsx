@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
+import { Product, Shipment } from '../types';
 
 interface Message {
   role: 'user' | 'model';
   text: string;
+}
+
+interface AJCBotProps {
+  products: Product[];
+  shipments: Shipment[];
 }
 
 const AVAILABLE_MODELS = [
@@ -12,10 +18,10 @@ const AVAILABLE_MODELS = [
   { id: 'gemini-3-pro-preview', name: 'Gemini 3.0 Pro' },
 ];
 
-const AJCBot: React.FC = () => {
+const AJCBot: React.FC<AJCBotProps> = ({ products, shipments }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Hello! I am AJC-Bot. How can I assist you with our frozen food products or logistics services today?' }
+    { role: 'model', text: 'Hello! I am AJC-Bot. I have access to the live logistics database. How can I assist you with stock levels or shipment tracking today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -43,23 +49,40 @@ const AJCBot: React.FC = () => {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
+      // Serialize current data to provide context to the LLM
+      const dataContext = `
+      DATE: ${new Date().toLocaleDateString()}
+
+      LIVE INVENTORY DATA:
+      ${products.length > 0 
+        ? products.map(p => `- Product: ${p.name} | Category: ${p.category} | Stock: ${p.stock_level} ${p.unit} | Location: ${p.location}`).join('\n')
+        : 'No products found in database.'}
+
+      LIVE SHIPMENT DATA:
+      ${shipments.length > 0
+        ? shipments.map(s => `- Tracking ID: ${s.tracking_number} | Status: ${s.status} | Product: ${s.product_name} | Route: ${s.origin} -> ${s.destination} | ETA: ${s.eta}`).join('\n')
+        : 'No active shipments found.'}
+      `;
+
       const systemInstruction = `
         You are AJC-Bot, a specialized AI assistant for AJC International. 
         AJC is a global leader in marketing frozen foods (poultry, pork, beef, seafood, vegetables, fries) and logistics.
         
+        **CRITICAL: Use the provided "LIVE INVENTORY DATA" and "LIVE SHIPMENT DATA" above to answer specific questions.** 
+        If a user asks about stock, look at the inventory data. If they ask about a shipment, look at the shipment data.
+        If the data is not in the context provided, politely say you don't have that information.
+        
         Key Business Context:
         - Connecting agricultural producers with global markets.
         - AJC Logistics provides transport solutions.
-        - Suppliers in 38+ countries.
-        - Models: Own brands and private label services.
         
         Directives:
-        1. **Formatting**: You MUST use Markdown for all responses. Use bolding (**text**) for key terms, bullet points for lists, and concise paragraphs.
+        1. **Formatting**: You MUST use Markdown for all responses. Use bolding (**text**) for key terms, bullet points for lists.
         2. **Language**: Detect the language of the user's message. If they speak Spanish, reply in Spanish. If English, reply in English.
-        3. **Tone**: Professional, efficient, helpful, and knowledgeable.
+        3. **Tone**: Professional, efficient, helpful.
         
-        If asked about technical details of the app:
-        - This app uses Supabase for backend and React for frontend.
+        Data Context:
+        ${dataContext}
       `;
 
       const response = await ai.models.generateContent({

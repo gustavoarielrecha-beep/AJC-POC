@@ -120,7 +120,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <AJCBot />
+      <AJCBot products={products} shipments={shipments} />
       
       {activeTab !== 'map' && (
         <footer className="bg-gray-800 text-white py-6 text-center text-xs">
