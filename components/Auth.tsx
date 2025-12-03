@@ -31,16 +31,26 @@ const Auth: React.FC = () => {
   };
 
   const handleOAuth = async (provider: 'github' | 'google' | 'azure') => {
-    // IMPORTANT: The Redirect URL must be whitelisted in Supabase Dashboard > Auth > URL Configuration
-    const currentOrigin = window.location.origin;
-    console.log(`Attempting OAuth with redirect to: ${currentOrigin}`);
+    // IMPORTANT: 
+    // 1. "http://usdcfscmdswrmt1.ajc.bz:3005" MUST be added to Supabase Dashboard > Auth > URL Configuration > Redirect URLs
+    // 2. If this fails and goes to localhost:3000, it means Supabase rejected this URL and fell back to the default Site URL.
+    
+    // We prefer the specific production domain if available, otherwise fallback to window location
+    const targetUrl = 'http://usdcfscmdswrmt1.ajc.bz:3005';
+    
+    console.log(`Authenticating with ${provider}. Redirecting to: ${targetUrl}`);
 
-    await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: currentOrigin
+        redirectTo: targetUrl,
       }
     });
+
+    if (error) {
+        console.error("OAuth Error:", error);
+        setMessage(`Error: ${error.message}`);
+    }
   };
 
   return (

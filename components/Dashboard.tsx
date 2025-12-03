@@ -1,4 +1,4 @@
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo, Suspense, useState } from 'react';
 import { Product, Shipment, ShipmentStatus } from '../types';
 import {
   BarChart,
@@ -40,6 +40,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ products, shipments, onViewFullMap }) => {
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   
   const categoryData = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -69,6 +70,16 @@ const Dashboard: React.FC<DashboardProps> = ({ products, shipments, onViewFullMa
     delayedShipments: shipments.filter(s => s.status === ShipmentStatus.CUSTOMS).length,
     totalValue: products.length * 15000 // Estimated placeholder value
   }), [products, shipments]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case ShipmentStatus.IN_TRANSIT: return 'bg-blue-100 text-blue-700';
+      case ShipmentStatus.DELIVERED: return 'bg-green-100 text-green-700';
+      case ShipmentStatus.PENDING: return 'bg-gray-100 text-gray-600';
+      case ShipmentStatus.CUSTOMS: return 'bg-yellow-100 text-yellow-700';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">
@@ -157,34 +168,100 @@ const Dashboard: React.FC<DashboardProps> = ({ products, shipments, onViewFullMa
         </div>
       </div>
 
-      {/* Map Section - Optimized */}
-      <div className="w-full bg-white p-6 rounded-2xl shadow-card border border-gray-100">
-        <div className="mb-4 flex items-center justify-between">
-           <div>
-              <h2 className="text-lg font-bold text-gray-800">Global Shipment Overview</h2>
-              <p className="text-xs text-gray-500">Showing active logistics routes</p>
-           </div>
-           <button 
-             onClick={onViewFullMap}
-             className="text-sm bg-blue-50 text-ajc-blue px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors flex items-center gap-2"
-           >
-             <i className="fas fa-expand-alt"></i> View Full Map
-           </button>
-        </div>
-        
-        {/* Reduced Height Container for Dashboard View */}
-        <div className="h-72 w-full rounded-xl overflow-hidden relative bg-gray-50">
-           <Suspense fallback={
-             <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                <i className="fas fa-spinner fa-spin mr-2"></i> Loading map...
+      {/* Map & Shipments Split Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Map Column */}
+        <div className="bg-white p-4 rounded-2xl shadow-card border border-gray-100 flex flex-col h-[500px]">
+          <div className="mb-4 flex items-center justify-between">
+             <div>
+                <h2 className="text-lg font-bold text-gray-800">Global Overview</h2>
+                <p className="text-xs text-gray-500">Interactive shipment map</p>
              </div>
-           }>
-             <ShipmentMap shipments={shipments} />
-           </Suspense>
-           
-           {/* Non-interactive overlay to encourage using full map for detailed interaction, 
-               and to prevent scrolling issues on dashboard */}
-           <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-black/5 rounded-xl"></div>
+             <button 
+               onClick={onViewFullMap}
+               className="text-xs bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+             >
+               <i className="fas fa-expand-alt mr-1"></i> Expand
+             </button>
+          </div>
+          
+          <div className="flex-grow w-full rounded-xl overflow-hidden relative bg-gray-50">
+             <Suspense fallback={
+               <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                  <i className="fas fa-spinner fa-spin mr-2"></i> Loading map...
+               </div>
+             }>
+               <ShipmentMap 
+                  shipments={shipments} 
+                  selectedShipmentId={selectedShipmentId}
+               />
+             </Suspense>
+          </div>
+        </div>
+
+        {/* Shipments List Column */}
+        <div className="bg-white p-4 rounded-2xl shadow-card border border-gray-100 h-[500px] flex flex-col">
+          <div className="mb-4">
+             <h2 className="text-lg font-bold text-gray-800">Active Logistics</h2>
+             <p className="text-xs text-gray-500">Select a shipment to view on map</p>
+          </div>
+          
+          <div className="flex-grow overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+            {shipments.map((shipment) => (
+              <div 
+                key={shipment.id}
+                onClick={() => setSelectedShipmentId(selectedShipmentId === shipment.id ? null : shipment.id)}
+                className={`p-4 rounded-xl border transition-all cursor-pointer hover:shadow-md ${
+                  selectedShipmentId === shipment.id 
+                    ? 'border-ajc-blue bg-blue-50 ring-1 ring-ajc-blue' 
+                    : 'border-gray-100 hover:border-blue-200 bg-white'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                      {shipment.tracking_number}
+                    </span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${getStatusColor(shipment.status)}`}>
+                    {shipment.status}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between mt-3">
+                   <div className="flex flex-col">
+                      <span className="text-xs text-gray-400 uppercase font-semibold">Origin</span>
+                      <span className="text-sm font-medium text-gray-800">{shipment.origin}</span>
+                   </div>
+                   <div className="flex flex-col items-center px-4">
+                      <i className="fas fa-arrow-right text-gray-300"></i>
+                      <span className="text-[10px] text-gray-400">{shipment.product_name}</span>
+                   </div>
+                   <div className="flex flex-col text-right">
+                      <span className="text-xs text-gray-400 uppercase font-semibold">Destination</span>
+                      <span className="text-sm font-medium text-gray-800">{shipment.destination}</span>
+                   </div>
+                </div>
+                
+                <div className="mt-3 pt-3 border-t border-gray-100/50 flex justify-between items-center">
+                   <span className="text-xs text-gray-400">
+                     <i className="far fa-calendar mr-1"></i> ETA: {new Date(shipment.eta).toLocaleDateString()}
+                   </span>
+                   {selectedShipmentId === shipment.id && (
+                     <span className="text-xs text-ajc-blue font-bold flex items-center animate-pulse">
+                       Viewing on map <i className="fas fa-map-marker-alt ml-1"></i>
+                     </span>
+                   )}
+                </div>
+              </div>
+            ))}
+            {shipments.length === 0 && (
+              <div className="text-center py-10 text-gray-400">
+                <i className="fas fa-box-open text-3xl mb-2"></i>
+                <p>No active shipments found.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

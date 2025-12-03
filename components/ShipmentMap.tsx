@@ -1,17 +1,36 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { Shipment, ShipmentStatus } from '../types';
 import L from 'leaflet';
 
 interface ShipmentMapProps {
   shipments: Shipment[];
+  selectedShipmentId?: string | null;
 }
 
-const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments }) => {
-  // Custom Icon generation to avoid standard Leaflet asset issues in React build
-  const createCustomIcon = (iconClass: string, color: string) => {
+// Sub-component to handle map zooming/panning effects
+const MapController: React.FC<{ selectedShipment?: Shipment }> = ({ selectedShipment }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (selectedShipment && selectedShipment.origin_lat && selectedShipment.dest_lat) {
+      const bounds = L.latLngBounds(
+        [selectedShipment.origin_lat, selectedShipment.origin_lng!],
+        [selectedShipment.dest_lat, selectedShipment.dest_lng!]
+      );
+      map.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
+    }
+  }, [selectedShipment, map]);
+
+  return null;
+};
+
+const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments, selectedShipmentId }) => {
+  // Custom Icon generation
+  const createCustomIcon = (iconClass: string, color: string, isDimmed: boolean) => {
+    const opacity = isDimmed ? 0.4 : 1;
     return L.divIcon({
-      html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+      html: `<div style="background-color: ${color}; opacity: ${opacity}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                <i class="${iconClass}" style="color: white; font-size: 12px;"></i>
              </div>`,
       className: 'custom-div-icon',
@@ -21,9 +40,6 @@ const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments }) => {
     });
   };
 
-  const originIcon = createCustomIcon('fas fa-warehouse', '#64748b'); // Slate-500
-  const destIcon = createCustomIcon('fas fa-map-pin', '#cc0000'); // AJC Red
-  
   const getShipmentColor = (status: ShipmentStatus) => {
     switch (status) {
       case ShipmentStatus.IN_TRANSIT: return '#003366'; // AJC Blue
@@ -34,8 +50,11 @@ const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments }) => {
     }
   };
 
+  // Determine active shipment object
+  const activeShipment = shipments.find(s => s.id === selectedShipmentId);
+
   return (
-    <div className="h-[400px] w-full rounded-2xl overflow-hidden shadow-card border border-gray-100 z-0 relative">
+    <div className="h-full w-full z-0 relative">
       <MapContainer 
         center={[20, 0]} 
         zoom={2} 
@@ -48,13 +67,26 @@ const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments }) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
+        <MapController selectedShipment={activeShipment} />
+
         {shipments.map((shipment) => {
           if (!shipment.origin_lat || !shipment.dest_lat) return null;
+
+          const isSelected = selectedShipmentId === shipment.id;
+          const isDimmed = selectedShipmentId ? !isSelected : false;
+
+          const originIcon = createCustomIcon('fas fa-warehouse', '#64748b', isDimmed); 
+          const destIcon = createCustomIcon('fas fa-map-pin', '#cc0000', isDimmed); 
 
           return (
             <React.Fragment key={shipment.id}>
               {/* Origin Marker */}
-              <Marker position={[shipment.origin_lat, shipment.origin_lng!] as [number, number]} icon={originIcon}>
+              <Marker 
+                position={[shipment.origin_lat, shipment.origin_lng!] as [number, number]} 
+                icon={originIcon}
+                opacity={isDimmed ? 0.4 : 1}
+                zIndexOffset={isSelected ? 1000 : 0}
+              >
                 <Popup>
                   <div className="text-xs font-sans">
                     <strong>Origin: {shipment.origin}</strong><br/>
@@ -64,7 +96,12 @@ const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments }) => {
               </Marker>
 
               {/* Destination Marker */}
-              <Marker position={[shipment.dest_lat!, shipment.dest_lng!] as [number, number]} icon={destIcon}>
+              <Marker 
+                position={[shipment.dest_lat!, shipment.dest_lng!] as [number, number]} 
+                icon={destIcon}
+                opacity={isDimmed ? 0.4 : 1}
+                zIndexOffset={isSelected ? 1000 : 0}
+              >
                  <Popup>
                   <div className="text-xs font-sans">
                     <strong>Dest: {shipment.destination}</strong><br/>
@@ -81,10 +118,10 @@ const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments }) => {
                   [shipment.dest_lat!, shipment.dest_lng!] as [number, number]
                 ]}
                 pathOptions={{ 
-                    color: getShipmentColor(shipment.status), 
-                    weight: 2, 
-                    dashArray: shipment.status === ShipmentStatus.PENDING ? '5, 10' : undefined,
-                    opacity: 0.7
+                    color: isSelected ? '#ff0000' : getShipmentColor(shipment.status), 
+                    weight: isSelected ? 4 : 2, 
+                    dashArray: shipment.status === ShipmentStatus.PENDING && !isSelected ? '5, 10' : undefined,
+                    opacity: isDimmed ? 0.1 : (isSelected ? 1 : 0.6)
                 }}
               />
             </React.Fragment>
