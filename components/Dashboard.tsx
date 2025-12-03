@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Product, Shipment, ShipmentStatus } from '../types';
+import ShipmentMap from './ShipmentMap';
 import {
   BarChart,
   Bar,
@@ -151,6 +152,15 @@ const Dashboard: React.FC<DashboardProps> = ({ products, shipments }) => {
              </div>
           </div>
         </div>
+      </div>
+
+      {/* Map Section */}
+      <div className="w-full">
+        <div className="mb-4 flex items-center justify-between">
+           <h2 className="text-lg font-bold text-gray-800">Global Shipment Tracking</h2>
+           <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">Live View</span>
+        </div>
+        <ShipmentMap shipments={shipments} />
       </div>
 
       {/* Charts Section */}

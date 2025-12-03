@@ -31,6 +31,10 @@ CREATE TABLE public.shipments (
   tracking_number TEXT UNIQUE NOT NULL, -- Ex: SH-2024-001
   origin TEXT NOT NULL,
   destination TEXT NOT NULL,
+  origin_lat FLOAT, -- New: Latitude for Origin
+  origin_lng FLOAT, -- New: Longitude for Origin
+  dest_lat FLOAT,   -- New: Latitude for Destination
+  dest_lng FLOAT,   -- New: Longitude for Destination
   status shipment_status DEFAULT 'Pending',
   product_name TEXT,
   eta DATE,
@@ -95,9 +99,11 @@ INSERT INTO public.products (name, category, stock_level, unit, location) VALUES
 ('French Fries 9x9', 'Fries', 500, 'MT', 'Antwerp Warehouse'),
 ('Tilapia Fillets', 'Seafood', 300, 'MT', 'Santos Terminal');
 
--- Insert Shipments
-INSERT INTO public.shipments (tracking_number, origin, destination, status, product_name, eta) VALUES
-('SH-2024-001', 'Santos, BR', 'Shanghai, CN', 'In Transit', 'Poultry', '2024-04-15'),
-('SH-2024-002', 'Rotterdam, NL', 'Lagos, NG', 'Customs', 'Fries', '2024-03-28'),
-('SH-2024-003', 'Jacksonville, US', 'San Juan, PR', 'Pending', 'Pork', '2024-04-02'),
-('SH-2024-004', 'Busan, KR', 'Tokyo, JP', 'In Transit', 'Seafood', '2024-03-30');
+-- Insert Shipments with Coordinates
+INSERT INTO public.shipments 
+(tracking_number, origin, destination, status, product_name, eta, origin_lat, origin_lng, dest_lat, dest_lng) 
+VALUES
+('SH-2024-001', 'Santos, BR', 'Shanghai, CN', 'In Transit', 'Poultry', '2024-04-15', -23.9618, -46.3322, 31.2304, 121.4737),
+('SH-2024-002', 'Rotterdam, NL', 'Lagos, NG', 'Customs', 'Fries', '2024-03-28', 51.9225, 4.47917, 6.5244, 3.3792),
+('SH-2024-003', 'Jacksonville, US', 'San Juan, PR', 'Pending', 'Pork', '2024-04-02', 30.3322, -81.6557, 18.4655, -66.1057),
+('SH-2024-004', 'Busan, KR', 'Tokyo, JP', 'In Transit', 'Seafood', '2024-03-30', 35.1796, 129.0756, 35.6762, 139.6503);

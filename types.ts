@@ -45,9 +45,12 @@ export enum UserRole {
     tracking_number: string;
     origin: string;
     destination: string;
+    origin_lat?: number;
+    origin_lng?: number;
+    dest_lat?: number;
+    dest_lng?: number;
     status: ShipmentStatus;
     product_name: string;
     eta: string;
     created_at: string;
   }
-  
