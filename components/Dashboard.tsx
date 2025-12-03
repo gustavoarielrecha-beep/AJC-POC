@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, Suspense } from 'react';
 import { Product, Shipment, ShipmentStatus } from '../types';
-import ShipmentMap from './ShipmentMap';
 import {
   BarChart,
   Bar,
@@ -15,9 +14,13 @@ import {
   Legend
 } from 'recharts';
 
+// Lazy load the map to improve dashboard TTI (Time to Interactive)
+const ShipmentMap = React.lazy(() => import('./ShipmentMap'));
+
 interface DashboardProps {
   products: Product[];
   shipments: Shipment[];
+  onViewFullMap: () => void;
 }
 
 const COLORS = ['#003366', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
@@ -36,7 +39,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ products, shipments }) => {
+const Dashboard: React.FC<DashboardProps> = ({ products, shipments, onViewFullMap }) => {
   
   const categoryData = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -154,13 +157,35 @@ const Dashboard: React.FC<DashboardProps> = ({ products, shipments }) => {
         </div>
       </div>
 
-      {/* Map Section */}
-      <div className="w-full">
+      {/* Map Section - Optimized */}
+      <div className="w-full bg-white p-6 rounded-2xl shadow-card border border-gray-100">
         <div className="mb-4 flex items-center justify-between">
-           <h2 className="text-lg font-bold text-gray-800">Global Shipment Tracking</h2>
-           <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">Live View</span>
+           <div>
+              <h2 className="text-lg font-bold text-gray-800">Global Shipment Overview</h2>
+              <p className="text-xs text-gray-500">Showing active logistics routes</p>
+           </div>
+           <button 
+             onClick={onViewFullMap}
+             className="text-sm bg-blue-50 text-ajc-blue px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors flex items-center gap-2"
+           >
+             <i className="fas fa-expand-alt"></i> View Full Map
+           </button>
         </div>
-        <ShipmentMap shipments={shipments} />
+        
+        {/* Reduced Height Container for Dashboard View */}
+        <div className="h-72 w-full rounded-xl overflow-hidden relative bg-gray-50">
+           <Suspense fallback={
+             <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                <i className="fas fa-spinner fa-spin mr-2"></i> Loading map...
+             </div>
+           }>
+             <ShipmentMap shipments={shipments} />
+           </Suspense>
+           
+           {/* Non-interactive overlay to encourage using full map for detailed interaction, 
+               and to prevent scrolling issues on dashboard */}
+           <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-black/5 rounded-xl"></div>
+        </div>
       </div>
 
       {/* Charts Section */}

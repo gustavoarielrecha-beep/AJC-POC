@@ -36,6 +36,16 @@ const Navbar: React.FC<NavbarProps> = ({ session, profile, activeTab, setActiveT
                     Dashboard
                   </button>
                   <button
+                    onClick={() => setActiveTab('map')}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      activeTab === 'map' 
+                        ? 'bg-ajc-blue text-white shadow-lg shadow-blue-900/20' 
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-ajc-blue'
+                    }`}
+                  >
+                    Global Map
+                  </button>
+                  <button
                     onClick={() => setActiveTab('inventory')}
                     className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                       activeTab === 'inventory' 
@@ -89,6 +99,10 @@ const Navbar: React.FC<NavbarProps> = ({ session, profile, activeTab, setActiveT
            <button onClick={() => setActiveTab('dashboard')} className={`p-4 rounded-xl flex flex-col items-center ${activeTab === 'dashboard' ? 'text-ajc-blue' : 'text-gray-400'}`}>
              <i className="fas fa-chart-line text-lg mb-1"></i>
              <span className="text-[10px] font-bold">Dash</span>
+           </button>
+           <button onClick={() => setActiveTab('map')} className={`p-4 rounded-xl flex flex-col items-center ${activeTab === 'map' ? 'text-ajc-blue' : 'text-gray-400'}`}>
+             <i className="fas fa-globe-americas text-lg mb-1"></i>
+             <span className="text-[10px] font-bold">Map</span>
            </button>
            <button onClick={() => setActiveTab('inventory')} className={`p-4 rounded-xl flex flex-col items-center ${activeTab === 'inventory' ? 'text-ajc-blue' : 'text-gray-400'}`}>
              <i className="fas fa-boxes text-lg mb-1"></i>
