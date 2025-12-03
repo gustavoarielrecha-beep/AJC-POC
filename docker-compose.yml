@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    image: node:20-alpine
+    working_dir: /app
+    # Using a command to install deps and run the dev server since we aren't using a Dockerfile build step
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 3005"
+    volumes:
+      - .:/app
+    ports:
+      - "3005:3005"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - NODE_ENV=development
