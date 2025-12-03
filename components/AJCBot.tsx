@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'model';
@@ -52,8 +53,10 @@ const AJCBot: React.FC = () => {
         - Suppliers in 38+ countries.
         - Models: Own brands and private label services.
         
-        Tone: Professional, efficient, helpful, and knowledgeable about global trade and cold chain logistics.
-        Language: English.
+        Directives:
+        1. **Formatting**: You MUST use Markdown for all responses. Use bolding (**text**) for key terms, bullet points for lists, and concise paragraphs.
+        2. **Language**: Detect the language of the user's message. If they speak Spanish, reply in Spanish. If English, reply in English.
+        3. **Tone**: Professional, efficient, helpful, and knowledgeable.
         
         If asked about technical details of the app:
         - This app uses Supabase for backend and React for frontend.
@@ -162,13 +165,21 @@ const AJCBot: React.FC = () => {
                 className={`mb-4 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 text-sm shadow-sm ${
+                  className={`max-w-[85%] rounded-lg p-3 text-sm shadow-sm ${
                     msg.role === 'user'
                       ? 'bg-blue-600 text-white rounded-br-none'
                       : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
                   }`}
                 >
-                  {msg.text}
+                  {msg.role === 'user' ? (
+                    msg.text
+                  ) : (
+                    <ReactMarkdown 
+                      className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ul:pl-4 prose-li:my-0 text-gray-800"
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
+                  )}
                 </div>
               </div>
             ))}

@@ -1,0 +1,28 @@
+-- Run this SQL in your Supabase SQL Editor to update existing records with map coordinates
+
+-- 1. Ensure columns exist (if using an older schema version)
+ALTER TABLE public.shipments ADD COLUMN IF NOT EXISTS origin_lat FLOAT;
+ALTER TABLE public.shipments ADD COLUMN IF NOT EXISTS origin_lng FLOAT;
+ALTER TABLE public.shipments ADD COLUMN IF NOT EXISTS dest_lat FLOAT;
+ALTER TABLE public.shipments ADD COLUMN IF NOT EXISTS dest_lng FLOAT;
+
+-- 2. Update existing shipments with coordinates
+-- Shipment 1: Santos to Shanghai
+UPDATE public.shipments 
+SET origin_lat = -23.9618, origin_lng = -46.3322, dest_lat = 31.2304, dest_lng = 121.4737 
+WHERE tracking_number = 'SH-2024-001';
+
+-- Shipment 2: Rotterdam to Lagos
+UPDATE public.shipments 
+SET origin_lat = 51.9225, origin_lng = 4.47917, dest_lat = 6.5244, dest_lng = 3.3792 
+WHERE tracking_number = 'SH-2024-002';
+
+-- Shipment 3: Jacksonville to San Juan
+UPDATE public.shipments 
+SET origin_lat = 30.3322, origin_lng = -81.6557, dest_lat = 18.4655, dest_lng = -66.1057 
+WHERE tracking_number = 'SH-2024-003';
+
+-- Shipment 4: Busan to Tokyo
+UPDATE public.shipments 
+SET origin_lat = 35.1796, origin_lng = 129.0756, dest_lat = 35.6762, dest_lng = 139.6503 
+WHERE tracking_number = 'SH-2024-004';
