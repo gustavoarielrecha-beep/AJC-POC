@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 interface Message {
   role: 'user' | 'model';
   text: string;
 }
+
+const AVAILABLE_MODELS = [
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+  { id: 'gemini-3-pro-preview', name: 'Gemini 3.0 Pro' },
+];
 
 const AJCBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +18,9 @@ const AJCBot: React.FC = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(AVAILABLE_MODELS[0].id);
+  const [showModelSelector, setShowModelSelector] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -51,9 +59,8 @@ const AJCBot: React.FC = () => {
         - This app uses Supabase for backend and React for frontend.
       `;
 
-      // Using Gemini 2.5 Flash as requested
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: selectedModel,
         contents: [
             ...messages.map(m => ({
                 role: m.role,
@@ -99,18 +106,56 @@ const AJCBot: React.FC = () => {
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-xl shadow-2xl flex flex-col z-50 border border-gray-200 overflow-hidden">
           {/* Header */}
-          <div className="bg-ajc-blue text-white p-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-                <i className="fas fa-robot"></i>
-                <h3 className="font-bold">AJC-Bot Assistant</h3>
+          <div className="bg-ajc-blue text-white p-4 flex justify-between items-start">
+            <div>
+                <div className="flex items-center gap-2">
+                    <i className="fas fa-robot"></i>
+                    <h3 className="font-bold">AJC-Bot Assistant</h3>
+                </div>
+                
+                {/* Status and Model Selector */}
+                <div className="text-xs text-blue-200 mt-1 flex items-center gap-2 relative select-none">
+                   <span className="flex items-center gap-1.5 bg-blue-900/30 px-2 py-0.5 rounded-full">
+                      <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`}></span>
+                      {isLoading ? 'Thinking...' : 'Online'}
+                   </span>
+                   <span className="text-blue-300">|</span>
+                   <div className="relative">
+                       <button
+                         onClick={() => setShowModelSelector(!showModelSelector)}
+                         className="hover:text-white flex items-center gap-1 transition-colors font-medium"
+                       >
+                          {AVAILABLE_MODELS.find(m => m.id === selectedModel)?.name}
+                          <i className={`fas fa-chevron-down text-[10px] transition-transform duration-200 ${showModelSelector ? 'rotate-180' : ''}`}></i>
+                       </button>
+
+                       {/* Model Dropdown */}
+                       {showModelSelector && (
+                          <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl text-gray-800 py-1 z-50 border border-gray-100 animate-in fade-in zoom-in-95 duration-100">
+                              <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider">Select Model</div>
+                              {AVAILABLE_MODELS.map(m => (
+                                  <button
+                                     key={m.id}
+                                     onClick={() => { setSelectedModel(m.id); setShowModelSelector(false); }}
+                                     className={`w-full text-left px-4 py-2 text-xs hover:bg-blue-50 flex items-center justify-between group ${selectedModel === m.id ? 'font-bold text-ajc-blue bg-blue-50' : 'text-gray-600'}`}
+                                  >
+                                      {m.name}
+                                      {selectedModel === m.id && <i className="fas fa-check text-ajc-blue"></i>}
+                                  </button>
+                              ))}
+                          </div>
+                       )}
+                   </div>
+                </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white">
+            
+            <button onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white transition-colors">
               <i className="fas fa-times"></i>
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+          <div className="flex-1 p-4 overflow-y-auto bg-gray-50" onClick={() => setShowModelSelector(false)}>
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -151,6 +196,7 @@ const AJCBot: React.FC = () => {
                 onKeyDown={handleKeyPress}
                 placeholder="Ask about AJC Logistics..."
                 className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500 bg-white text-black"
+                disabled={isLoading}
               />
               <button
                 onClick={handleSend}
