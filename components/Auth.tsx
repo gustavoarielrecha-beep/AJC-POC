@@ -31,10 +31,14 @@ const Auth: React.FC = () => {
   };
 
   const handleOAuth = async (provider: 'github' | 'google' | 'azure') => {
+    // IMPORTANT: The Redirect URL must be whitelisted in Supabase Dashboard > Auth > URL Configuration
+    const currentOrigin = window.location.origin;
+    console.log(`Attempting OAuth with redirect to: ${currentOrigin}`);
+
     await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: window.location.origin
+        redirectTo: currentOrigin
       }
     });
   };
