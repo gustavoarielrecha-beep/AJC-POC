@@ -103,9 +103,18 @@ const AJCBot: React.FC<AJCBotProps> = ({ products, shipments }) => {
       
       setMessages(prev => [...prev, { role: 'model', text: text }]);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Gemini Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "I'm having trouble connecting to the AJC knowledge base right now. Please try again later." }]);
+      let errorMessage = "I'm having trouble connecting to the AJC knowledge base right now.";
+      
+      // Extract specific error message for debugging
+      if (error.message) {
+        errorMessage += `\n\n**Error Details:** ${error.message}`;
+      } else if (error.toString) {
+        errorMessage += `\n\n**Error:** ${error.toString()}`;
+      }
+
+      setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
