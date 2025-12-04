@@ -30,7 +30,7 @@ const Auth: React.FC = () => {
     setLoading(false);
   };
 
-  const handleOAuth = async (provider: 'github' | 'google' | 'azure') => {
+  const handleOAuth = async (provider: 'github' | 'google' | 'azure' | 'facebook') => {
     // IMPORTANT: 
     // 1. "https://usdcfscmdswrmt1.ajc.bz:3005" MUST be added to Supabase Dashboard > Auth > URL Configuration > Redirect URLs
     // 2. If this fails and goes to localhost:3000, it means Supabase rejected this URL and fell back to the default Site URL.
@@ -105,29 +105,31 @@ const Auth: React.FC = () => {
             </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-2 gap-3">
             <button 
                 onClick={() => handleOAuth('github')}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-                <i className="fab fa-github mr-2 mt-1"></i> GitHub
+                <i className="fab fa-github mr-2 text-lg"></i> GitHub
             </button>
-             {/* Note: Google and Azure require specific provider setup in Supabase dashboard. 
-                 Using Generic structure here as placeholders for functionality. */}
-            <div className="grid grid-cols-2 gap-3">
-                 <button 
-                    onClick={() => handleOAuth('google')}
-                    className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                    <i className="fab fa-google mr-2 mt-1"></i> Google
-                </button>
-                 <button 
-                    onClick={() => handleOAuth('azure')}
-                    className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                    <i className="fab fa-microsoft mr-2 mt-1"></i> Azure
-                </button>
-            </div>
+            <button 
+                onClick={() => handleOAuth('facebook')}
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+                <i className="fab fa-facebook mr-2 text-lg text-blue-600"></i> Facebook
+            </button>
+            <button 
+                onClick={() => handleOAuth('google')}
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+                <i className="fab fa-google mr-2 text-lg text-red-500"></i> Google
+            </button>
+            <button 
+                onClick={() => handleOAuth('azure')}
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+                <i className="fab fa-microsoft mr-2 text-lg text-blue-500"></i> Azure
+            </button>
         </div>
 
         <div className="text-center">
