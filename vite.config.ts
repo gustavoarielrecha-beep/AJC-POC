@@ -10,9 +10,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3005,
-    hmr: {
-      overlay: false,
-    },
     https: {
       key: fs.readFileSync('./cert_ajc.key'),
       cert: fs.readFileSync('./cert_ajc.crt'),
