@@ -8,6 +8,8 @@ services:
     command: sh -c "npm install -g npm@11.6.4 && npm install && npm run dev -- --host 0.0.0.0 --port 3005"
     volumes:
       - .:/app
+      - ./cert_ajc.crt:/app/cert_ajc.crt
+      - ./cert_ajc.key:/app/cert_ajc.key
     ports:
       - "3005:3005"
     deploy:

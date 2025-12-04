@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 
 export default defineConfig({
   plugins: [react()],
@@ -9,6 +10,10 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3005,
+    https: {
+      key: fs.readFileSync('./cert_ajc.key'),
+      cert: fs.readFileSync('./cert_ajc.crt'),
+    },
     allowedHosts: ['usdcfscmdswrmt1.ajc.bz', 'localhost', '127.0.0.1'],
   },
 });

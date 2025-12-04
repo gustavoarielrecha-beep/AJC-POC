@@ -32,11 +32,11 @@ const Auth: React.FC = () => {
 
   const handleOAuth = async (provider: 'github' | 'google' | 'azure') => {
     // IMPORTANT: 
-    // 1. "http://usdcfscmdswrmt1.ajc.bz:3005" MUST be added to Supabase Dashboard > Auth > URL Configuration > Redirect URLs
+    // 1. "https://usdcfscmdswrmt1.ajc.bz:3005" MUST be added to Supabase Dashboard > Auth > URL Configuration > Redirect URLs
     // 2. If this fails and goes to localhost:3000, it means Supabase rejected this URL and fell back to the default Site URL.
     
     // We prefer the specific production domain if available, otherwise fallback to window location
-    const targetUrl = 'http://usdcfscmdswrmt1.ajc.bz:3005';
+    const targetUrl = 'https://usdcfscmdswrmt1.ajc.bz:3005';
     
     console.log(`Authenticating with ${provider}. Redirecting to: ${targetUrl}`);
 
