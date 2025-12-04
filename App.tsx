@@ -4,7 +4,7 @@ import { Profile, Product, Shipment } from './types';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
-import Shipments from './components/Shipments';
+import { Shipments } from './components/Shipments';
 import Auth from './components/Auth';
 import AJCBot from './components/AJCBot';
 
@@ -57,10 +57,10 @@ const App: React.FC = () => {
   };
 
   const fetchBusinessData = async () => {
-    const { data: prodData } = await supabase.from('products').select('*');
+    const { data: prodData } = await supabase.from('products').select('*').order('created_at', { ascending: false });
     if (prodData) setProducts(prodData as Product[]);
 
-    const { data: shipData } = await supabase.from('shipments').select('*');
+    const { data: shipData } = await supabase.from('shipments').select('*').order('created_at', { ascending: false });
     if (shipData) setShipments(shipData as Shipment[]);
   };
 
@@ -93,8 +93,18 @@ const App: React.FC = () => {
             onViewFullMap={() => setActiveTab('map')}
           />
         )}
-        {activeTab === 'inventory' && <Inventory products={products} />}
-        {activeTab === 'shipments' && <Shipments shipments={shipments} />}
+        {activeTab === 'inventory' && (
+          <Inventory 
+            products={products} 
+            onDataUpdate={fetchBusinessData}
+          />
+        )}
+        {activeTab === 'shipments' && (
+          <Shipments 
+            shipments={shipments} 
+            onDataUpdate={fetchBusinessData}
+          />
+        )}
         {activeTab === 'map' && (
            <div className="h-[calc(100vh-5rem)] w-full relative">
              <Suspense fallback={
