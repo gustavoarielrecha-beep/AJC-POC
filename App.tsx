@@ -4,7 +4,7 @@ import { Profile, Product, Shipment } from './types';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
-import { Shipments } from './components/Shipments';
+import Shipments from './components/Shipments';
 import Auth from './components/Auth';
 import AJCBot from './components/AJCBot';
 
@@ -93,18 +93,8 @@ const App: React.FC = () => {
             onViewFullMap={() => setActiveTab('map')}
           />
         )}
-        {activeTab === 'inventory' && (
-          <Inventory 
-            products={products} 
-            onDataUpdate={fetchBusinessData} 
-          />
-        )}
-        {activeTab === 'shipments' && (
-          <Shipments 
-            shipments={shipments} 
-            onDataUpdate={fetchBusinessData} 
-          />
-        )}
+        {activeTab === 'inventory' && <Inventory products={products} />}
+        {activeTab === 'shipments' && <Shipments shipments={shipments} />}
         {activeTab === 'map' && (
            <div className="h-[calc(100vh-5rem)] w-full relative">
              <Suspense fallback={
