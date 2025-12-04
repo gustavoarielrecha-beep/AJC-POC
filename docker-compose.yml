@@ -18,3 +18,10 @@ services:
         condition: on-failure
     environment:
       - NODE_ENV=development
+      - AI_API_KEY_FILE=/run/secrets/ajc_ai_api_key
+    secrets:
+      - ajc_ai_api_key
+
+secrets:
+  ajc_ai_api_key:
+    external: true
