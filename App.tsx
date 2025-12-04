@@ -4,7 +4,7 @@ import { Profile, Product, Shipment } from './types';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
-import { Shipments } from './components/Shipments';
+import { Shipments as ShipmentsList } from './components/Shipments';
 import Auth from './components/Auth';
 import AJCBot from './components/AJCBot';
 
@@ -100,7 +100,7 @@ const App: React.FC = () => {
           />
         )}
         {activeTab === 'shipments' && (
-          <Shipments 
+          <ShipmentsList 
             shipments={shipments} 
             onDataUpdate={fetchBusinessData}
           />
