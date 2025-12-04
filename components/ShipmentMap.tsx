@@ -8,9 +8,17 @@ interface ShipmentMapProps {
   selectedShipmentId?: string | null;
 }
 
-// Sub-component to handle map zooming/panning effects
+// Sub-component to handle map zooming/panning effects AND resizing issues
 const MapController: React.FC<{ selectedShipment?: Shipment }> = ({ selectedShipment }) => {
   const map = useMap();
+
+  // Fix for partial map loading: invalidate size after mount to ensure tiles render correctly
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 100); // 100ms delay to allow container layout to finalize
+    return () => clearTimeout(timer);
+  }, [map]);
 
   useEffect(() => {
     if (selectedShipment && selectedShipment.origin_lat && selectedShipment.dest_lat) {
@@ -54,7 +62,7 @@ const ShipmentMap: React.FC<ShipmentMapProps> = ({ shipments, selectedShipmentId
   const activeShipment = shipments.find(s => s.id === selectedShipmentId);
 
   return (
-    <div className="h-full w-full z-0 relative">
+    <div className="h-full w-full z-0 relative isolate">
       <MapContainer 
         center={[20, 0]} 
         zoom={2} 
