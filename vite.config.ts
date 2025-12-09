@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
 
-// Logic to read API Key from Docker Secret or fallback to env var/hardcoded
+// Logic to read API Key from Docker Secret or fallback to env var
 let apiKey = process.env.API_KEY || "";
 
 // Check if the secret file path is provided via environment variable
@@ -16,18 +16,15 @@ if (secretFilePath) {
       apiKey = fs.readFileSync(secretFilePath, 'utf-8').trim();
       console.log('Successfully loaded API Key from Docker Secret.');
     } else {
-      console.warn(`Secret file not found at: ${secretFilePath}`);
+      console.warn(`Secret file configured at ${secretFilePath} but file does not exist.`);
     }
   } catch (err) {
     console.error('Error reading secret file:', err);
   }
 }
 
-// Fallback for local dev if secret not present (Optional: keep hardcoded for local dev ease, or remove for strict security)
 if (!apiKey) {
-    // Fallback solely for demonstration if secret setup is skipped locally
-    apiKey = "AIzaSyAedD8WaMU7Ws7-tQRjm8YQZktRL-RfqsU"; 
-    console.warn("Using fallback/hardcoded API Key. Ensure secrets are configured in production.");
+    console.warn("WARNING: No API Key found in Docker Secret or Environment Variables. AI features will not work.");
 }
 
 export default defineConfig({
@@ -35,6 +32,7 @@ export default defineConfig({
   define: {
     // Inject the resolved apiKey into the frontend code
     'process.env.API_KEY': JSON.stringify(apiKey),
+    // Define process.env to prevent ReferenceError in some libraries
     'process.env': {},
   },
   server: {

@@ -18,6 +18,7 @@ services:
         condition: on-failure
     environment:
       - NODE_ENV=development
+      # Path inside the container where Docker injects the secret
       - AI_API_KEY_FILE=/run/secrets/ajc_ai_api_key
     secrets:
       - ajc_ai_api_key
