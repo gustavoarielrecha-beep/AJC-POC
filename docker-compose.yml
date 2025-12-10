@@ -4,14 +4,15 @@ services:
   web:
     image: node:20-alpine
     working_dir: /app
-    # Using a command to install deps and run the dev server since we aren't using a Dockerfile build step
-    command: sh -c "npm install -g npm@11.6.4 && npm install && npm run dev -- --host 0.0.0.0 --port 3005"
+    # Using a command to install deps and run the custom server script
+    command: sh -c "npm install -g npm@11.6.4 && npm install && node server.js"
     volumes:
       - .:/app
       - ./cert_ajc.crt:/app/cert_ajc.crt
       - ./cert_ajc.key:/app/cert_ajc.key
     ports:
       - "3005:3005"
+      - "3006:3006"
     deploy:
       replicas: 1
       restart_policy:
