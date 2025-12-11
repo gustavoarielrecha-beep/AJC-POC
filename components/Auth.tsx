@@ -30,7 +30,7 @@ const Auth: React.FC = () => {
     setLoading(false);
   };
 
-  const handleOAuth = async (provider: 'github' | 'google' | 'azure' | 'facebook') => {
+  const handleOAuth = async (provider: 'github' | 'google' | 'facebook') => {
     // IMPORTANT: 
     // 1. "https://usdcfscmdswrmt1.ajc.bz:3005" MUST be added to Supabase Dashboard > Auth > URL Configuration > Redirect URLs
     // 2. If this fails and goes to localhost:3000, it means Supabase rejected this URL and fell back to the default Site URL.
@@ -120,15 +120,9 @@ const Auth: React.FC = () => {
             </button>
             <button 
                 onClick={() => handleOAuth('google')}
-                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 col-span-2"
             >
                 <i className="fab fa-google mr-2 text-lg text-red-500"></i> Google
-            </button>
-            <button 
-                onClick={() => handleOAuth('azure')}
-                className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-                <i className="fab fa-microsoft mr-2 text-lg text-blue-500"></i> Azure
             </button>
         </div>
 
